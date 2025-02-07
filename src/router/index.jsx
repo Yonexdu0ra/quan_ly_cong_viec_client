@@ -1,87 +1,151 @@
 import { lazy, Suspense } from "react";
-import { createBrowserRouter } from "react-router-dom";
-
-import LoadingRoutes from "./LoadingRoutes";
-import AuthenticationProvider from "../context/authenticationContext";
-import RequireLoginPage from "./RequireLoginPage";
-import AuthenticationRoute from "./AuthenticationRoute";
-import LoadingPage from "./LoadingPage";
-import JobProvider from "../context/jobContext";
+import { createBrowserRouter, Outlet } from "react-router-dom";
 import DefaultLayout from "../component/layout/DefaultLayout";
-const Register = lazy(() => import("../pages/Register"));
+import SidebarProvider from "../context/SidebarContext";
+import AuthenticationProvider from "../context/authenticationContext";
+import ToastProvider from "../context/ToastContext";
+import JobProvider from "../context/jobContext";
+import ProtectedRoutes from "./ProtectedRoute";
+import PublicRoutes from "./PublicRoutes";
+import { Spinner } from "@material-tailwind/react";
+import RedirectRoutes from "./RedirectRoutes";
+import LoadingRoutes from "./LoadingRoutes";
+import ScheduleProvider from "../context/scheduleContext";
+const Feedback = lazy(() => import("../pages/Feedback"));
+const ErrorPage = lazy(() => import("../pages/Error"));
 const Home = lazy(() => import("../pages/Home"));
-const ChangePassword = lazy(() => import("../pages/ChangePassword"));
-const Profile = lazy(() => import("../pages/Profile"));
 const Login = lazy(() => import("../pages/Login"));
-const Error = lazy(() => import("../pages/Error"));
+const Register = lazy(() => import("../pages/Register"));
+const ForgotPassword = lazy(() => import("../pages/ForgotPassword"));
+const Profile = lazy(() => import("../pages/Profile"));
+const NotificationManager = lazy(() => import("../pages/NotificationManager"));
+const ChangePassword = lazy(() => import("../pages/ChangePassword"));
+
+// Component bọc Suspense cho lazy loading
+const LazyWrapper = ({ children }) => (
+  <Suspense
+    fallback={
+      <div className="flex justify-center items-center h-screen bg-bg">
+        <Spinner />
+      </div>
+    }
+  >
+    {children}
+  </Suspense>
+);
+
+// Định nghĩa các route công khai (không cần xác thực)
+const publicRoutes = [
+  {
+    path: "/login",
+    element: (
+      <LazyWrapper>
+        <Login />
+      </LazyWrapper>
+    ),
+  },
+  {
+    path: "/register",
+    element: (
+      <LazyWrapper>
+        <Register />
+      </LazyWrapper>
+    ),
+  },
+  {
+    path: "/forgot-password",
+    element: (
+      <LazyWrapper>
+        <ForgotPassword />
+      </LazyWrapper>
+    ),
+  },
+];
+
+// Định nghĩa các route riêng (cần xác thực)
+const privateRoutes = [
+  {
+    path: "/",
+    element: (
+      <LazyWrapper>
+        <JobProvider>
+          <Home />
+        </JobProvider>
+      </LazyWrapper>
+    ),
+  },
+  {
+    path: "/feedback",
+    element: (
+      <LazyWrapper>
+        <Feedback />
+      </LazyWrapper>
+    ),
+  },
+  {
+    path: "/notification-manager",
+    element: (
+      <LazyWrapper>
+        <ScheduleProvider>
+          <NotificationManager />
+        </ScheduleProvider>
+      </LazyWrapper>
+    ),
+  },
+  {
+    path: "/Profile",
+    element: (
+      <LazyWrapper>
+        <Profile />
+      </LazyWrapper>
+    ),
+  },
+  {
+    path: "/change-password",
+    element: (
+      <LazyWrapper>
+        <ChangePassword />
+      </LazyWrapper>
+    ),
+  },
+];
 
 const router = createBrowserRouter([
   {
     element: (
       <AuthenticationProvider>
-        <LoadingRoutes />
+        <ToastProvider>
+          <SidebarProvider>
+            <LoadingRoutes>
+              <Outlet />
+            </LoadingRoutes>
+          </SidebarProvider>
+        </ToastProvider>
       </AuthenticationProvider>
     ),
-    errorElement: <RequireLoginPage />,
+    errorElement: (
+      <LazyWrapper>
+        <ErrorPage />
+      </LazyWrapper>
+    ),
     children: [
       {
-        element: <AuthenticationRoute />,
-        errorElement: (
-          <Suspense fallback={<LoadingPage />}>
-            <Error />
-          </Suspense>
+        element: (
+          <LazyWrapper>
+            <ProtectedRoutes>
+              <DefaultLayout />
+            </ProtectedRoutes>
+          </LazyWrapper>
         ),
-        children: [
-          {
-            element: (
-              <JobProvider>
-                <DefaultLayout />
-              </JobProvider>
-            ),
-            children: [
-              {
-                element: (
-                  <Suspense fallback={<LoadingPage />}>
-                    <Home />
-                  </Suspense>
-                ),
-                path: "/",
-              },
-              {
-                element: (
-                  <Suspense fallback={<LoadingPage />}>
-                    <ChangePassword />
-                  </Suspense>
-                ),
-                path: "/change-password",
-              },
-              {
-                element: (
-                  <Suspense fallback={<LoadingPage />}>
-                    <Profile />
-                  </Suspense>
-                ),
-                path: "/profile",
-              },
-            ],
-          },
-        ],
+        children: [...privateRoutes],
       },
       {
-        element: (
-          <Suspense fallback={<LoadingPage />}>
-            <Login />
-          </Suspense>
-        ),
-        path: "/login",
+        element: <PublicRoutes />,
+        children: [...publicRoutes],
       },
       {
-        element: (
-          <Suspense fallback={<LoadingPage />}>
-            <Register />
-          </Suspense>
-        ),
-        path: "/register",
+        path: "*",
+        element: <RedirectRoutes />,
       },
     ],
   },

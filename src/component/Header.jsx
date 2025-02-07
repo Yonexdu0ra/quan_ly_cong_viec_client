@@ -1,59 +1,67 @@
+import { useSidebar } from "../context/SidebarContext";
+import {  useAuth } from "../context/authenticationContext";
+import {
+  Bars3BottomRightIcon,
+  Bars3BottomLeftIcon,
+} from "@heroicons/react/24/solid";
 import {
   Menu,
-  Navbar,
   MenuHandler,
   MenuList,
-  Typography,
   MenuItem,
 } from "@material-tailwind/react";
-import { useContext } from "react";
-import { authenticationContext } from "../context/authenticationContext";
+import { UserCircleIcon } from "@heroicons/react/24/solid";
 import { Link } from "react-router-dom";
-import useResize from "../hooks/useResize";
-
 function Header() {
-  const { loginData, setLoginData } = useContext(authenticationContext);
-  const { width } = useResize();
+  const { isOpenSidebar, toggleSidebar } = useSidebar();
+  const {setLoginData, loginData} = useAuth()
   const handleLogout = () => {
-    localStorage.clear();
-    setLoginData({});
-  };
-  const name =
-    loginData.fullname.length > 15
-      ? "..." + loginData.fullname.slice(15)
-      : loginData.fullname;
+    localStorage.clear()
+    setLoginData({})
+  }
   return (
-    <header className="absolute w-full top-0 left-0 h-[var(--header-height)] z-10">
-      <Navbar
-        fullWidth={true}
-        color="transparent"
-        className="h-[64px] rounded-bl-md rounded-br-md justify-between w-full shadow"
+    <div className="fixed top-0 left-0 w-full z-50 h-[var(--header-height)]  bg-primary-50 flex items-center justify-between px-4 select-none">
+      <div
+        className={`cursor-pointer px-4 py-2 rounded-md hover:bg-secondary-200 duration-300 `}
+        onClick={toggleSidebar}
       >
-        <div className="flex gap-2 items-center justify-between w-full">
-          <Link to="/" className="text-2xl">
-            QL công việc
-          </Link>
-          <Menu>
-            <MenuHandler>
-              <Typography color="white" className="cursor-pointer">
-                {name}
-              </Typography>
-            </MenuHandler>
-            <MenuList color="white">
-              <Link to="/profile">
-                <MenuItem color="white">Profile</MenuItem>
-              </Link>
-              <Link to="/change-password">
-                <MenuItem color="white">Change Password</MenuItem>
-              </Link>
-              <MenuItem onClick={handleLogout} color="white">
-                Logout
-              </MenuItem>
-            </MenuList>
-          </Menu>
-        </div>
-      </Navbar>
-    </header>
+        {isOpenSidebar ? (
+          <Bars3BottomRightIcon className="h-5 w-5" />
+        ) : (
+          <Bars3BottomLeftIcon className="h-5 w-5" />
+        )}
+      </div>
+      <div>
+        <h2 className="hidden sm:block text-primary-500 font-bold text-3xl">
+          Quản lý Công Việc
+        </h2>
+        <h2 className="block sm:hidden text-primary-500 font-bold text-3xl">
+          QLCV
+        </h2>
+      </div>
+      <div>
+        <Menu>
+          <MenuHandler>
+            <div className="hover:bg-secondary-200 px-4 py-2 duration-300 -w-48  truncate cursor-pointer rounded-md flex items-center gap-2 justify-center">
+              <UserCircleIcon className="h-7 w-7" />
+              <p className="hidden sm:inline">{loginData.fullname}</p>
+            </div>
+          </MenuHandler>
+          <MenuList className="bg-bg truncate w-52">
+            <p className="text-center sm:hidden text-primary-500 max-w-52 truncate">
+              {loginData.fullname}
+            </p>
+            <Link to={"/profile"}>
+              <MenuItem>Trang cá nhân</MenuItem>
+            </Link>
+            <Link to={"/change-password"}>
+              <MenuItem>Đổi mật khẩu</MenuItem>
+            </Link>
+            <MenuItem onClick={handleLogout}>Đăng xuất</MenuItem>
+          </MenuList>
+        </Menu>
+      </div>
+    </div>
   );
 }
 

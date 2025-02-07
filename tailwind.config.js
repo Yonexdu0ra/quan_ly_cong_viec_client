@@ -5,28 +5,53 @@ export default withMT({
   theme: {
     colors: {
       primary: {
-        50: "#edfff3",
-        100: "#d5ffe6",
-        200: "#aeffcd",
-        300: "#70ffa8",
-        400: "#2bfd7b",
-        500: "#00f55e",
-        600: "#00c045",
-        700: "#009639",
-        800: "#067532",
-        900: "#07602b",
-        950: "#003716",
+        50: "#ecf4ff",
+        100: "#ddeaff",
+        200: "#c2d8ff",
+        300: "#9dbeff",
+        400: "#7697ff",
+        500: "#4d6bfe",
+        600: "#3748f4",
+        700: "#2b38d7",
+        800: "#2530ae",
+        900: "#263189",
+        950: "#171c4f",
       },
-      secondary: "#212121",
-      accent: "#171717",
-      neutral: "#424242",
-      layer: "#383838",
-      success: "#17B978",
-      warning: "#FFB020",
-      error: "#F77066",
-      text: "#ECECEC",
+      secondary: {
+        50: "#f9f9f9",
+        100: "#ececec",
+        200: "#e3e3e3",
+        300: "#cdcdcd",
+        400: "#b4b4b4",
+        500: "#9b9b9b",
+        600: "#676767",
+        700: "#424242",
+        750: "#2f2f2f",
+        800: "#212121",
+        900: "#171717",
+        950: "#0d0d0d",
+      },
+      "text-secondary": "#9b9b9b",
+      bg: "#fff",
+      error: {
+        500: "#ef4444",
+        700: "#b91c1c",
+      },
+      "brand-purple": "#ab68ff",
+      warning: {
+        900: "#927201",
+      },
     },
     extend: {
+      keyframes: {
+        "show-toast": {
+          "0%, 50%": { opacity: 0, transform: "translateX(10%)" },
+          "100%": { opacity: 1, transform: "translateX(0)" },
+        },
+      },
+      animation: {
+        "show-toast": "show-toast 0.5s ease-in-out",
+      },
       fontFamily: {
         mono: [
           "ui-monospace",
@@ -46,7 +71,8 @@ export default withMT({
       addBase({
         ":root": {
           "--header-height": "64px",
-          "--footer-height": "25px",
+          "--footer-height": "30px",
+          "--sidebar-width": "300px",
         },
       });
     },

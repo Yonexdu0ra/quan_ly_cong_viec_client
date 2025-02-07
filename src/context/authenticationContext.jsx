@@ -1,13 +1,14 @@
-import { createContext, useEffect, useState } from "react";
-import { request } from "../utils/request";
+import { createContext, useContext, useEffect, useState } from "react";
+import request from "../utils/request";
 export const authenticationContext = createContext({});
-
+export const useAuth = () => {
+  return useContext(authenticationContext);
+};
 const AuthenticationProvider = ({ children }) => {
-  const [loadingPage, setLoadingPage] = useState(true);
+  const [isLoadingPage, setIsLoadingPage] = useState(true);
   const [loginData, setLoginData] = useState({});
-  
+
   useEffect(() => {
-   
     const fetchData = async () => {
       try {
         if (loginData?.id) return;
@@ -24,19 +25,17 @@ const AuthenticationProvider = ({ children }) => {
         localStorage.clear();
         return;
       } finally {
-        setLoadingPage(false);
+        setIsLoadingPage(false);
       }
-    }
-    fetchData()
-
-
+    };
+    fetchData();
   }, []);
 
   return (
     <authenticationContext.Provider
       value={{
-        loadingPage,
-        setLoadingPage,
+        isLoadingPage,
+        setIsLoadingPage,
         loginData,
         setLoginData,
       }}

@@ -1,141 +1,182 @@
 import {
-  Button,
   Dialog,
+  DialogHeader,
+  DialogBody,
+  DialogFooter,
+  Button,
   Input,
-  Option,
-  Select,
   Textarea,
+  Select,
+  Option,
+  Alert,
 } from "@material-tailwind/react";
-import { useContext, useState } from "react";
-import { graphQLRequest, request } from "../utils/request";
-import { jobContext } from "../context/JobContext";
-function ModalUpdateJob({ handleOpen, open, job }) {
-  const { status, setJobData } = useContext(jobContext);
-  const [data, setData] = useState(job);
-  const [disabled, setDisabled] = useState(false);
+import useResize from "../hooks/useResize";
+import { useRef, useState } from "react";
+import { useJob } from "../context/jobContext";
+import { useToast } from "../context/toastContext";
+import request from "../utils/request";
+function ModalUpdateJob({ open, onClose, data }) {
+  const { status, setJobData } = useJob();
+  const { addMessage } = useToast();
+  const [formData, setFormData] = useState(data);
 
-  const handleChangeJobName = (e) => {
-    setData((cur) => ({ ...cur, jobName: e.target.value }));
-  };
-  const handleChangeJobDescription = (e) => {
-    setData((cur) => ({ ...cur, jobDescription: e.target.value }));
-  };
-  const handleChangeStatus = (value) => {
-    setData((cur) => ({ ...cur, status: value }));
-  };
-
-  const handleUpdateJob = async () => {
-    try {
-      setDisabled(true);
-      //       const query = `
-      //         mutation Mutation($updateJobId: String, $jobName: String, $jobDescription: String, $status: String) {
-      //   updateJob(id: $updateJobId, jobName: $jobName, jobDescription: $jobDescription, status: $status) {
-      //     id
-      //     jobName
-      //     jobDescription
-      //     status
-      //     userId
-      //     createdAt
-      //     updatedAt
-      //   }
-      // }
-
-      // `;
-      //       const variables = {
-      //         updateJobId: data.id,
-      //         jobName: data.jobName,
-      //         jobDescription: data.jobDescription,
-      //         status: data.status,
-      //       };
-      //       const response = await graphQLRequest({ query, variables });
-
-      //       if (response?.data?.updateJob) {
-      //         setJobData((cur) =>
-      //           cur.map((item) =>
-      //             item.id === data.id ? response.data.updateJob : item
-      //           )
-      //         );
-      //       }
-
-      const {
-        status,
-        message,
-        data: response,
-      } = await request(`/job/${job.id}`, {
-        method: "PUT",
-        body: JSON.stringify(data),
+  const [errorSelect, setErrorSelect] = useState({
+    error: false,
+    message: "",
+  });
+  const MAX_LENGTH_JOBNAME = 200;
+  const MAX_LENGTH_JOBDESCRIPTION = 1000;
+  const listStatus = Object.entries(status).map(([key, value]) => ({
+    value: key,
+    title: value.title,
+  }));
+  const { width } = useResize();
+  const isMobile = width < 768;
+  const size = isMobile ? "xxl" : "md";
+  const buttonRef = useRef();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!formData.status) {
+      setErrorSelect({
+        error: true,
+        message: "Vui lòng chọn trạng thái",
       });
-      if (status === "success") {
-        setJobData((cur) => ({
-          ...cur,
-          rows: cur.rows.map((item) => item.id === response.id ? response : item)
+      return;
+    }
+    try {
+      const response = await request("/job" + "/" + data.id, {
+        method: "PUT",
+        body: formData,
+      });
+      if (response.status === "success") {
+        setJobData((prev) => ({
+          ...prev,
+          rows: prev.rows.map((row) =>
+            row.id === response.data.id ? response.data : row
+          ),
         }));
       }
-      handleOpen();
-      alert(message);
+      addMessage(response);
+      onClose();
     } catch (error) {
-      console.log(error);
-      alert("Có lỗi xảy ra");
-      handleOpen();
+      addMessage({
+        status: "error",
+        message: error.message || "Đã có lỗi xảy ra vui lòng thử lại sau.",
+      });
       return;
     }
   };
-
+  const handleClicked = () => {
+    if (buttonRef?.current) {
+      buttonRef?.current?.requestSubmit();
+    }
+  };
+  const handleChangeStatus = (value) => {
+    setErrorSelect({
+      error: false,
+      message: "",
+    });
+    setFormData({
+      ...formData,
+      status: value,
+    });
+  };
+  const handleChangeJobName = (event) => {
+    const value = event.target.value;
+    if (value.length > MAX_LENGTH_JOBNAME) return;
+    setFormData({
+      ...formData,
+      jobName: value,
+    });
+  };
+  const handleChangeJobDescription = (event) => {
+    const value = event.target.value;
+    if (value.length > MAX_LENGTH_JOBDESCRIPTION) return;
+    setFormData({
+      ...formData,
+      jobDescription: event.target.value,
+    });
+  };
   return (
-    <Dialog
-      open={open}
-      handler={handleOpen}
-      className="bg-transparent shadow-none"
-    >
-      <div className="flex flex-col bg-layer p-10 gap-5 text-white rounded-md">
-        <h1 className="text-3xl sm:text-4xl font-mono">Thêm công việc</h1>
-        <Input
-          label="Tên công việc"
-          color="white"
-          onChange={handleChangeJobName}
-          value={data.jobName}
-          readOnly={disabled}
-        />
-        <Textarea
-          rows={10}
-          color="white"
-          placeholder="Nội dung công việc"
-          labelProps={{
-            className: "before:content-none after:content-none",
-          }}
-          onChange={handleChangeJobDescription}
-          value={data.jobDescription}
-          readOnly={disabled}
-        />
-        <Select
-          labelProps={{
-            className: "before:content-none after:content-none",
-          }}
-          value={data.status}
-          onChange={handleChangeStatus}
-          className="bg-white"
+    <Dialog open={open} size={size} className="max-w-xl">
+      <DialogHeader>
+        <h2 className="text-xl font-bold">Cập nhật công việc</h2>
+      </DialogHeader>
+      <DialogBody className="h-full overflow-y-auto">
+        <form
+          className="flex flex-col gap-4"
+          onSubmit={handleSubmit}
+          ref={buttonRef}
         >
-          {Object.entries(status)?.map((item) => (
-            <Option key={item[0]} value={item[0]}>
-              {item[1].title}
-            </Option>
-          ))}
-        </Select>
+          <Input
+            color="gray"
+            label="Tên công việc"
+            required
+            onChange={handleChangeJobName}
+            value={formData.jobName}
+          />
+          <p className="flex items-center">
+            <span
+              className={`${
+                formData.jobName.length >= MAX_LENGTH_JOBNAME
+                  ? "text-red-500"
+                  : ""
+              }`}
+            >
+              {formData.jobName.length}
+            </span>
+            /<span>{MAX_LENGTH_JOBNAME} ký tự</span>
+          </p>
+          <Textarea
+            label="Mô tả công việc"
+            color="gray"
+            required
+            onChange={handleChangeJobDescription}
+            value={formData.jobDescription}
+            rows={12}
+          />
+          <p className="flex items-center">
+            <span
+              className={`${
+                formData.jobDescription.length >= MAX_LENGTH_JOBDESCRIPTION
+                  ? "text-red-500"
+                  : ""
+              }`}
+            >
+              {formData.jobDescription.length}
+            </span>
+            /<span>{MAX_LENGTH_JOBDESCRIPTION} ký tự</span>
+          </p>
 
-        <div className="flex justify-end gap-4">
-          <Button variant="text" color="red" onClick={handleOpen}>
-            Hủy
-          </Button>
-          <Button
-            variant="filled"
-            color="green"
-            onClick={handleUpdateJob}
-            loading={disabled}
+          <Select
+            label="Trạng thái"
+            color="gray"
+            value={formData.status}
+            onChange={handleChangeStatus}
           >
-            Cập nhật
-          </Button>
-        </div>
-      </div>
+            {listStatus.map((status) => (
+              <Option key={status.value} value={status.value}>
+                {status.title}
+              </Option>
+            ))}
+          </Select>
+          <Alert open={errorSelect.error} color="red">
+            {errorSelect.message}
+          </Alert>
+        </form>
+      </DialogBody>
+      <DialogFooter className="flex gap-4 items-center">
+        <Button color="gray" variant="text" onClick={onClose}>
+          Hủy
+        </Button>
+        <Button
+          type="submit"
+          className="bg-primary-500"
+          onClick={handleClicked}
+        >
+          Lưu
+        </Button>
+      </DialogFooter>
     </Dialog>
   );
 }

@@ -1,86 +1,61 @@
-import { API_URL, GRAPHQL_API_URL } from "./constant";
+import { API_URL } from "./constants";
 
-export const request = async (path, options) => {
+async function request(
+  path = "",
+  options = {
+    method: "GET",
+    body: null,
+  }
+) {
   try {
     const res = await fetch(`${API_URL}${path}`, {
       headers: {
-        "Content-Type": "application/json",
+        "content-type": "application/json",
         accept: "application/json",
-        Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-      },
-      body: options.body,
-      // credentials: 'include',
-      method: options.method || 'POST',
-    });
-    const data = await res.json();
-    const refresh_token = localStorage.getItem("refresh_token");
-    if (
-      data.status === "error" &&
-      data.message === "TokenExpiredError" &&
-      refresh_token
-    ) {
-      const refreshRes = await fetch(`${API_URL}/refresh_token`, {
-        headers: {
-          "Content-Type": "application/json",
-          accept: "application/json",
-        },
-        method: "POST",
-        body: JSON.stringify({
-          refresh_token,
-        }),
-      });
-      const refreshData = await refreshRes.json();
-      if (refreshData.status === "success") {
-        localStorage.setItem("access_token", refreshData.data.access_token);
-        return await request(path, options);
-      }
-      localStorage.clear();
-    }
-    return data;
-  } catch (error) {
-    return { status: "error", message: error.message, data: null };
-  }
-};
-
-export const graphQLRequest = async (payload, options = { method: "POST" }) => {
-  try {
-    const res = await fetch(GRAPHQL_API_URL, {
-      headers: {
-        "Content-Type": "application/json",
-        accept: "application/json",
-        Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-        ...options,
+        authorization: `Bearer ${localStorage.getItem("access_token")}`,
       },
       method: options.method,
-      body: JSON.stringify(payload),
-      //   credentials: "include",
+      body: options.body ? JSON.stringify(options.body) : null,
     });
     const data = await res.json();
     const refresh_token = localStorage.getItem("refresh_token");
     if (
-      data.status === "error" &&
+      res.status === 401 &&
       data.message === "TokenExpiredError" &&
       refresh_token
     ) {
-      const refreshRes = await fetch(`${API_URL}/refresh_token`, {
+      const refreshRes = await fetch(`${API_URL}/refresh-token`, {
+        method: "POST",
         headers: {
-          "Content-Type": "application/json",
+          "content-type": "application/json",
           accept: "application/json",
         },
-        method: "POST",
-        body: JSON.stringify({
-          refresh_token,
-        }),
+        body: JSON.stringify({ refresh_token }),
       });
-      const refreshData = await refreshRes.json();
-      if (refreshData.status === "success") {
-        localStorage.setItem("access_token", refreshData.data.access_token);
-        return await graphQLRequest(payload, options);
+
+      if (refreshRes.ok) {
+        const { data } = await refreshRes.json();
+        localStorage.setItem("access_token", data.access_token || "");
+        // Retry the original request with the new token
+        return request(path, options);
+      } else {
+        localStorage.clear();
+        return {
+          status: "error",
+          message: "Phiên bản hết hạn, vui lòng đăng nhập lại",
+        };
       }
-      localStorage.clear();
     }
+
     return data;
   } catch (error) {
-    return { status: "error", message: error.message, data: null };
+    console.log(error);
+
+    return {
+      status: "error",
+      message: error.message || "Đã có lỗi xảy ra, vui lòng thử lại sau",
+    };
   }
-};
+}
+
+export default request;

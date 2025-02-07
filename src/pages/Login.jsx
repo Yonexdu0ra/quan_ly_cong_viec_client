@@ -1,82 +1,103 @@
 import { Button, Input } from "@material-tailwind/react";
-import useResize from "../hooks/useResize";
-import { Link, Navigate } from "react-router-dom";
-import { useContext, useState } from "react";
-import { request } from "../utils/request";
-import { authenticationContext } from "../context/authenticationContext";
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import { useToast } from "../context/ToastContext";
+import { useAuth } from "../context/authenticationContext";
+import { EyeSlashIcon, EyeIcon } from "@heroicons/react/24/solid";
+import request from "../utils/request";
 function Login() {
-  const { height } = useResize();
-  const { loginData, setLoginData } = useContext(authenticationContext);
-  const [data, setData] = useState({
-    username: "",
-    password: "",
-  });
-
-  if (loginData.id) {
-    return <Navigate to="/" />;
-  }
-
-  // const navigate = useNavigate();
+  document.title = "Đăng nhập";
+  const [data, setData] = useState();
+  const { loginData, setLoginData } = useAuth();
+  const [showPassword, setShowPassword] = useState(false);
+  const { addMessage } = useToast();
+  const disabled =
+    !data?.username ||
+    !data?.password ||
+    data?.username.length < 5 ||
+    data?.password.length < 6;
   const handleChangeUsername = (e) => {
     setData({ ...data, username: e.target.value });
   };
   const handleChangePassword = (e) => {
     setData({ ...data, password: e.target.value });
   };
-  const handleSubmit = async () => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     try {
       const response = await request("/login", {
-        body: JSON.stringify(data),
+        method: "POST",
+        body: data,
       });
-
       if (response.status === "success") {
         localStorage.setItem("access_token", response.data.access_token);
         localStorage.setItem("refresh_token", response.data.refresh_token);
-
         setLoginData(response.data.user);
-        return;
       }
-      if(response.status === "error") {
-        alert(response.message);
-      }
+      addMessage(response)
+      
     } catch (error) {
-      console.log(error);
-    }
-  };
+      
 
+      addMessage({
+        status: "error",
+        message: error.message || "Đã có lỗi xảy ra, vui lòng thử lại sau",
+      });
+    }
+    return
+  };
+  const handleShowPassword = () => {
+    setShowPassword(!showPassword);
+  };
   return (
-    <div
-      className="flex justify-center items-center bg-accent text-white box-border"
-      style={{ height: "100vh" }}
-    >
-      <div className="bg-layer px-6 py-3 rounded-lg flex flex-col gap-7 h-full w-full sm:max-w-lg sm:h-auto justify-center items-center">
-        <h1 className="text-4xl font-mono">Quản lý công việc</h1>
+    <div className="flex h-screen items-center justify-center bg-bg">
+      <form
+        className="flex flex-col gap-4 max-w-xl w-full p-4 rounded-md border border-gray-200"
+        onSubmit={handleSubmit}
+      >
+        <h1 className="text-center text-xl sm:text-4xl font-bold">
+          Đăng nhập hệ thống
+        </h1>
         <Input
-          color="white"
-          label="Tài khoản"
+          label="Tài khoản"
+          color="blue-gray"
           onChange={handleChangeUsername}
         />
         <Input
-          color="white"
-          label="Mật khẩu"
-          type="password"
+          label="Mật khẩu"
+          color="blue-gray"
           onChange={handleChangePassword}
+          type={showPassword ? "text" : "password"}
+          icon={
+            showPassword ? (
+              <EyeIcon
+                onClick={handleShowPassword}
+                className="cursor-pointer"
+              />
+            ) : (
+              <EyeSlashIcon
+                onClick={handleShowPassword}
+                className="cursor-pointer"
+              />
+            )
+          }
         />
-        <Button
-          className="bg-primary-600 text-primary-50"
-          onClick={handleSubmit}
-        >
-          Đăng nhập
+        <Button type="submit" className="bg-primary-500" disabled={disabled}>
+          Đăng nhập
         </Button>
-        <div className="flex justify-between">
+        <div className="flex flex-col gap-2 justify-center items-center">
+          <Link to={"/forgot-password"}>
+            <p className="text-blue-500">Quên mật khẩu</p>
+          </Link>
           <p>
-            Nếu bạn chưa có tài khoản hãy đăng ký{" "}
+            Nếu bạn chưa có tài khoản hãy đăng ký{" "}
             <Link to="/register">
-              <span className="text-blue-500">tại đây.</span>
+              <span className="text-blue-500">tại đây</span>
             </Link>
+            .
           </p>
         </div>
-      </div>
+      </form>
     </div>
   );
 }

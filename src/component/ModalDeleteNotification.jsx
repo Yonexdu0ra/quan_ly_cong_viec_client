@@ -12,22 +12,22 @@ import {
 } from "@material-tailwind/react";
 import useResize from "../hooks/useResize";
 import { useRef, useState } from "react";
-import { useJob } from "../context/jobContext";
 import { useToast } from "../context/toastContext";
 import request from "../utils/request";
-function ModalDeleteJob({ open, onClose, data }) {
-  const {  setJobData } = useJob();
+import { useSchedule } from "../context/scheduleContext";
+function ModalDeleteNotification({ open, onClose, data }) {
+  const { setScheduleData } = useSchedule();
   const { addMessage } = useToast();
   const { width } = useResize();
   const isMobile = width < 768;
   const size = isMobile ? "xxl" : "md";
   const handleDeleteJob = async (e) => {
     try {
-      const response = await request("/job" + "/" + data.id, {
+      const response = await request("/schedule" + "/" + data.id, {
         method: "DELETE",
       });
       if (response.status === "success") {
-        setJobData((prev) => ({
+        setScheduleData((prev) => ({
           count: prev.count - 1,
           rows: prev.rows.filter((row) => row.id !== data.id),
         }));
@@ -44,11 +44,11 @@ function ModalDeleteJob({ open, onClose, data }) {
   return (
     <Dialog open={open} size={size} className="max-w-xl">
       <DialogHeader>
-        <h2 className="text-xl font-bold">Xóa công việc</h2>
+        <h2 className="text-xl font-bold">Xóa thông báo</h2>
       </DialogHeader>
       <DialogBody className="h-full overflow-y-auto">
         <h2 className="text-2xl text-center">
-          Bạn có chắc chắn là muốn xóa công việc này?
+          Bạn có chắc chắn là muốn xóa thông báo này?
         </h2>
       </DialogBody>
       <DialogFooter className="flex gap-4 items-center">
@@ -68,4 +68,4 @@ function ModalDeleteJob({ open, onClose, data }) {
   );
 }
 
-export default ModalDeleteJob;
+export default ModalDeleteNotification;

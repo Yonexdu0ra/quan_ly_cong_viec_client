@@ -1,62 +1,58 @@
-import { Button, Dialog, Input, Textarea } from "@material-tailwind/react";
-import { useContext, useState } from "react";
-import { graphQLRequest } from "../utils/request";
-import { jobContext } from "../context/JobContext";
-function ModelViewJob({ handleOpen, open, job }) {
-  
+import {
+  Dialog,
+  DialogHeader,
+  DialogBody,
+  DialogFooter,
+  Button,
+  Input,
+  Textarea,
+  Select,
+  Option,
+} from "@material-tailwind/react";
+import useResize from "../hooks/useResize";
 
+import { useJob } from "../context/jobContext";
+function ModalViewJob({ open, onClose, data }) {
+  const { status } = useJob();
 
-  const { status } = useContext(jobContext);
-  const isUpdate = job.createdAt !== job.updatedAt;
+  const { width } = useResize();
+  const isMobile = width < 768;
+  const size = isMobile ? "xxl" : "md";
   return (
-    <Dialog
-      open={open}
-      handler={handleOpen}
-      className="bg-transparent shadow-none"
-    >
-      <div className="flex flex-col bg-layer p-10 gap-5 text-white rounded-md">
-        <h1 className="text-3xl sm:text-4xl font-mono">Thêm công việc</h1>
-        <Input
-          label="Tên công việc"
-          color="white"
-          readOnly
-          value={job.jobName}
-        />
-        <Textarea
-          rows={10}
-          color="white"
-          placeholder="Nội dung công việc"
-          // resize={true}
-          labelProps={{
-            className: "before:content-none after:content-none",
-          }}
-          readOnly
-          value={job.jobDescription}
-        />
-        <p className="flex flex-wrap gap-x-2 items-center">
-          Trạng thái:
-          <span className={`${status[job.status].color} px-2 py-1 rounded-md`}>
-            {status[job.status].title}
-          </span>
-        </p>
-        <p className="flex flex-wrap gap-x-2">
-          Ngày tạo: <span>{new Date(job.createdAt).toLocaleString()}</span>
-        </p>
-       
-        {isUpdate && (
-          <p className="flex flex-wrap gap-x-2">
-            Cập nhật gần đây:
-            <span>{new Date(job.updatedAt).toLocaleString()}</span>
-          </p>
-        )}
-        <div className="flex justify-end gap-4">
-          <Button variant="filled" color="green" onClick={handleOpen}>
-            Đóng
-          </Button>
+    <Dialog open={open} size={size} className="max-w-xl">
+      <DialogHeader>
+        <h2 className="text-xl font-bold">Thông tin công việc</h2>
+      </DialogHeader>
+      <DialogBody className="h-full overflow-y-auto">
+        <div className="flex flex-col gap-4">
+          <Input
+            color="gray"
+            label="Tên công việc"
+            value={data?.jobName}
+            readOnly
+          />
+
+          <Textarea
+            label="Mô tả công việc"
+            color="gray"
+            value={data?.jobDescription}
+            readOnly
+            rows={20}
+          />
+
+          {/* <Select label="Trạng thái" value={data?.status} color="gray">
+            <Option value={data?.status}>{status[data?.status]?.title}</Option>
+          </Select> */}
+          <Input label="Trạng thái" value={status[data?.status]?.title || ''} readOnly/>
         </div>
-      </div>
+      </DialogBody>
+      <DialogFooter className="flex gap-4 items-center">
+        <Button className="bg-primary-500" onClick={onClose}>
+          Đóng
+        </Button>
+      </DialogFooter>
     </Dialog>
   );
 }
 
-export default ModelViewJob;
+export default ModalViewJob;

@@ -1,176 +1,247 @@
-import { Button, Input } from "@material-tailwind/react";
-import useResize from "../hooks/useResize";
-import { Link, Navigate } from "react-router-dom";
-import { useContext, useState } from "react";
-import { request } from "../utils/request";
-import { authenticationContext } from "../context/authenticationContext";
+import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/solid";
+import { Alert, Button, Input, Spinner } from "@material-tailwind/react";
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import useDebound from "../hooks/useDebound";
+import validate from "../utils/validate";
+import request from "../utils/request";
+import { useToast } from '../context/toastContext'
 function Register() {
-  const { height } = useResize();
-  const [data, setData] = useState({});
-  const { loginData } = useContext(authenticationContext);
-  const [validate, setValidate] = useState({
-    email: {
-      error: false,
-      message: "",
-    },
-    password: {
-      error: false,
-      message: "",
-    },
+  document.title = "Đăng ký tài khoản";
+  const [showPassword, setShowPassword] = useState(false);
+  const [usernameExist, setUsernameExist] = useState({
+    isUernameExist: true,
+    loading: false,
+  });
+  const { addMessage } = useToast();
+  const [formData, setFormData] = useState({
     username: {
       error: false,
       message: "",
+      value: "",
     },
     fullname: {
       error: false,
       message: "",
+      value: "",
+    },
+    email: {
+      error: false,
+      message: "",
+      value: "",
+    },
+    password: {
+      error: false,
+      message: "",
+      value: "",
     },
   });
-  if (loginData.id) {
-    return <Navigate to="/" />;
-  }
+  const [deboundUsername] = useDebound(formData.username.value, 500);
+
+  const handleShowPassword = () => {
+    setShowPassword(!showPassword);
+  };
+  const handleSubmit =async (e) => {
+    e.preventDefault();
+    try {
+      const response = await request("/register", {
+        method: "POST",
+        body: {
+          username: formData.username.value,
+          fullname: formData.fullname.value,
+          email: formData.email.value,
+          password: formData.password.value,
+        },
+      })
+      addMessage(response);
+    } catch (error) {
+      addMessage({
+        status: "error",
+        message: error.message || 'Đã có lỗi xảy ra vui lòng thử lại sau.',
+      })
+    }
+  };
   const handleChangeUsername = (e) => {
     const value = e.target.value;
-    setData({ ...data, username: value });
-    if (value.length < 5) {
-      setValidate({
-        ...validate,
-        username: {
-          error: true,
-          message: "Tài khoản phải có ít nhất 5 kí tự",
-        },
-      });
-    } else {
-      setValidate({
-        ...validate,
-        username: {
-          error: false,
-          message: "",
-        },
-      });
-    }
+    const isUsername = validate.isUsername(value);
+    setFormData({
+      ...formData,
+      username: {
+        value: value,
+        error: !isUsername.status,
+        message: isUsername.message,
+      },
+    });
   };
-  const hanndleChangeFullname = (e) => {
+
+  const handleChangeFullname = (e) => {
     const value = e.target.value;
-    setData({ ...data, fullname: value });
-    if (value.length < 5) {
-      setValidate({
-        ...validate,
-        fullname: {
-          error: true,
-          message: "Họ và tên phải có ít nhất 5 kí tự",
-        },
-      });
-    } else {
-      setValidate({
-        ...validate,
-        fullname: {
-          error: false,
-          message: "",
-        },
-      });
-    }
-  };
-  const handleChangePassword = (e) => {
-    const value = e.target.value;
-    setData({ ...data, password: value });
-    if (value.length < 5) {
-      setValidate({
-        ...validate,
-        password: {
-          error: true,
-          message: "Mật khẩu phải có ít nhất 5 kí tự",
-        },
-      });
-    } else {
-      setValidate({
-        ...validate,
-        password: {
-          error: false,
-          message: "",
-        },
-      });
-    }
+    const isFullname = validate.isFullname(value);
+    setFormData({
+      ...formData,
+      fullname: {
+        value: value,
+        error: !isFullname.status,
+        message: isFullname.message,
+      },
+    });
   };
   const handleChangeEmail = (e) => {
     const value = e.target.value;
-    setData({ ...data, email: value });
-    if (!value.match(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/)) {
-      setValidate({
-        ...validate,
-        email: {
-          error: true,
-          message: "Email không hợp lệ",
-        },
-      });
-    } else {
-      setValidate({
-        ...validate,
-        email: {
-          error: false,
-          message: "",
-        },
-      });
-    }
+    const isEmail = validate.isEmail(value);
+    setFormData({
+      ...formData,
+      email: {
+        value: value,
+        error: !isEmail.status,
+        message: isEmail.message,
+      },
+    });
   };
-  const handleSubmit = async () => {
-    try {
-      const response = await request("/register", {
-        body: JSON.stringify(data),
-      });
-      // console.log(response);
-      alert(response.message);
-    } catch (error) {
-      console.log(error);
-    }
+  const handleChangePassword = (e) => {
+    const value = e.target.value;
+    const isPassword = validate.isPassword(value);
+    setFormData({
+      ...formData,
+      password: {
+        value: value,
+        error: !isPassword.status,
+        message: isPassword.message,
+      },
+    });
   };
+  useEffect(() => {
+    setUsernameExist({
+      ...usernameExist,
+      loading: true,
+      isUernameExist: true,
+    });
+    if (!validate.isUsername(deboundUsername).status) {
+      
+      return setUsernameExist({
+        ...usernameExist,
+        loading: false,
+        isUernameExist: true,
+      });
+    };
+    
+    const checkUsername = async () => {
+      try {
+        const response = await request(
+          "/check-username?username=" + deboundUsername
+        );
+        console.log(response);
+        if (response.status === "error") {
+          setUsernameExist({
+            ...usernameExist,
+            loading: false,
+            isUernameExist: true,
+          })
+          setFormData({
+            ...formData,
+            username: {
+              ...formData.username,
+              error: true,
+              message: response.message,
+            },
+          })
+          return;
+        }
+        setUsernameExist({
+          ...usernameExist,
+          isUernameExist: false,
+          loading: false,
+        });
+      } catch (error) {
+        setUsernameExist({
+          ...usernameExist,
+          loading: true,
+        });
+        return;
+      } 
+    };
+    checkUsername();
+  }, [deboundUsername]);
   return (
-    <div className="flex justify-center items-center bg-accent text-white h-screen">
-      <div className="bg-layer px-6 py-3 rounded-lg flex flex-col gap-7 h-full w-full sm:max-w-lg sm:h-auto justify-center items-center">
-        <h1 className="text-4xl font-mono">Quản lý công việc</h1>
+    <div className="flex h-screen items-center justify-center bg-bg">
+      <form
+        className="flex flex-col gap-4 max-w-xl w-full p-4 rounded-md border border-gray-200"
+        onSubmit={handleSubmit}
+      >
+        <h1 className="text-center text-xl sm:text-4xl font-bold">
+          Đăng ký tài khoản
+        </h1>
         <Input
-          color="white"
-          label="Tài khoản"
-          error={validate.username.error}
+          label="Tài khoản"
+          color="blue-gray"
           onChange={handleChangeUsername}
+          required
+          error={formData.username.error}
+          
         />
-        {validate.username.error && (
-          <p className="text-error">{validate.username.message}</p>
-        )}
+        <Alert color="red" open={formData.username.error}>
+          {formData.username.message}
+        </Alert>
+        {usernameExist.loading && <p>Đang kiểm tra tài khoản...</p>}
+        {!usernameExist.isUernameExist && <p className="text-green-500">Tài khoản này có thể dùng.</p>}
         <Input
-          color="white"
-          label="Họ và tên"
-          error={validate.fullname.error}
-          onChange={hanndleChangeFullname}
+          label="Họ và tên"
+          color="blue-gray"
+          required
+          onChange={handleChangeFullname}
+          error={formData.fullname.error}
         />
+        <Alert color="red" open={formData.fullname.error}>
+          {formData.fullname.message}
+        </Alert>
         <Input
-          color="white"
           label="Email"
-          error={validate.email.error}
+          color="blue-gray"
+          required
           onChange={handleChangeEmail}
+          error={formData.email.error}
         />
+        <Alert color="red" open={formData.email.error}>
+          {formData.email.message}
+        </Alert>
         <Input
-          color="white"
-          label="Mật khẩu"
-          type="password"
-          error={validate.password.error}
+          label="Mật khẩu"
+          color="blue-gray"
+          type={showPassword ? "text" : "password"}
+          icon={
+            showPassword ? (
+              <EyeIcon
+                onClick={handleShowPassword}
+                className="cursor-pointer"
+              />
+            ) : (
+              <EyeSlashIcon
+                onClick={handleShowPassword}
+                className="cursor-pointer"
+              />
+            )
+          }
+          required
           onChange={handleChangePassword}
+          error={formData.password.error}
         />
-        <Button
-          className="bg-primary-600 text-primary-50"
-          onClick={handleSubmit}
-        >
-          Đăng ký
+        <Alert color="red" open={formData.password.error}>
+          {formData.password.message}
+        </Alert>
+
+        <Button type="submit" className="bg-primary-500">
+          Đăng ký
         </Button>
-        <div className="flex justify-between">
+        <div className="flex flex-col gap-2 justify-center items-center">
           <p>
-            Nếu bạn đã có tài khoản hãy đăng nhập{" "}
+            Nếu bạn đã có tài khoản hãy đăng nhập{" "}
             <Link to="/login">
-              <span className="text-blue-500">tại đây.</span>
+              <span className="text-blue-500">tại đây</span>
             </Link>
+            .
           </p>
         </div>
-      </div>
+      </form>
     </div>
   );
 }

@@ -1,29 +1,38 @@
 import { lazy, Suspense } from "react";
 import { Outlet } from "react-router-dom";
 import useResize from "../../hooks/useResize";
+import { useSidebar } from "../../context/SidebarContext";
 const Header = lazy(() => import("../Header"));
+const Footer = lazy(() => import("../Footer"));
+const Sidebar = lazy(() => import("../Sidebar"));
 function DefaultLayout() {
-  const { height } = useResize();
-
+  const { width } = useResize();
+  const isMobile = width < 768;
+  const { isOpenSidebar } = useSidebar();
   return (
-    <div className="relative flex w-full overflow-hidden transition-colors z-0 bg-secondary text-white h-screen font-mono ">
-      <div className="relative flex h-full max-w-full flex-1 flex-col overflow-hidden">
-        <Suspense
-          fallback={
-            <div className="h-[var(--header-height)]  animate-pulse absolute top-0 left-0 w-full"></div>
-          }
-        >
-          <Header />
+    <div className="relative flex w-full flex-col  overflow-hidden transition-colors z-0 bg-white  text-gray-800 h-screen font-mono">
+      <Suspense>
+        <Header />
+      </Suspense>
+
+      <div className="flex  h-full pt-[var(--header-height)] pb-[var(--footer-height)]">
+        <Suspense>
+          <Sidebar />
         </Suspense>
-        <main
-          className="mt-[var(--header-height)] overflow-y-auto"
-          style={{
-            height: `${height}px`,
-          }}
+
+        <div
+          className={`${
+            isOpenSidebar && !isMobile
+              ? "w-[calc(100%-var(--sidebar-width))]"
+              : "w-full"
+          }  h-full overflow-y-auto duration-300`}
         >
           <Outlet />
-        </main>
+        </div>
       </div>
+      <Suspense>
+        <Footer />
+      </Suspense>
     </div>
   );
 }
