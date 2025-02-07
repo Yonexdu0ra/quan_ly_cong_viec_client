@@ -1,5 +1,4 @@
 import {
- 
   Menu,
   Navbar,
   MenuHandler,
@@ -19,7 +18,6 @@ function Header() {
     localStorage.clear();
     setLoginData({});
   };
-  ;
   const name =
     loginData.fullname.length > 15
       ? "..." + loginData.fullname.slice(15)
@@ -32,7 +30,9 @@ function Header() {
         className="h-[64px] rounded-bl-md rounded-br-md justify-between w-full shadow"
       >
         <div className="flex gap-2 items-center justify-between w-full">
-          <Link to='/' className="text-2xl">QL công việc</Link>
+          <Link to="/" className="text-2xl">
+            QL công việc
+          </Link>
           <Menu>
             <MenuHandler>
               <Typography color="white" className="cursor-pointer">
@@ -40,6 +40,12 @@ function Header() {
               </Typography>
             </MenuHandler>
             <MenuList color="white">
+              <Link to="/profile">
+                <MenuItem color="white">Profile</MenuItem>
+              </Link>
+              <Link to="/change-password">
+                <MenuItem color="white">Change Password</MenuItem>
+              </Link>
               <MenuItem onClick={handleLogout} color="white">
                 Logout
               </MenuItem>

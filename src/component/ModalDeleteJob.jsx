@@ -35,6 +35,7 @@ function ModalDeleteJob({ handleOpen, open, job }) {
       if(status === "success") {
         setJobData((cur) => ({
           ...cur,
+          count: cur.count - 1,
           rows: cur.rows.filter((item) => item.id !== job.id),
         }));
         // handleOpen();

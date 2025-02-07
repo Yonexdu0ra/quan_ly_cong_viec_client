@@ -42,17 +42,49 @@ function Home() {
     const fetchData = async () => {
       setLoadingJob(true);
       try {
-        let querySelect = "";
-        if (["DESC", "ASC"].includes(sortBy)) {
-          querySelect = `order=${sortBy}`;
-        } else {
-          querySelect = `status=${sortBy}`;
-        }
+        
 
         const response = await request(
-          `/job?${debouncedSearchTerm ? `jobName=${debouncedSearchTerm}` : ""}${
-            sortBy === "DESC" ? "" : "&" + querySelect
-          }`,
+          `/job?${debouncedSearchTerm ? `jobName=${debouncedSearchTerm}` : ""}`,
+          {
+            method: "GET",
+            body: null,
+          }
+        );
+        // let querySelect = "";
+        // if (["DESC", "ASC"].includes(sortBy)) {
+        //   querySelect = `order=${sortBy}`;
+        // } else {
+        //   querySelect = `status=${sortBy}`;
+        // }
+
+        // const response = await request(
+        //   `/job?${debouncedSearchTerm ? `jobName=${debouncedSearchTerm}` : ""}${
+        //     sortBy === "DESC" ? "" : "&" + querySelect
+        //   }`,
+        //   {
+        //     method: "GET",
+        //     body: null,
+        //   }
+        // );
+
+        setJobData(response.data || []);
+      } catch (error) {
+        console.error("Error fetching jobs:", error);
+      } finally {
+        setLoadingJob(false);
+      }
+    };
+
+    fetchData();
+  }, [debouncedSearchTerm]);
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoadingJob(true);
+      try {
+        
+        const response = await request(
+          `/job/sort?sortBy=${sortBy}`,
           {
             method: "GET",
             body: null,
@@ -68,7 +100,7 @@ function Home() {
     };
 
     fetchData();
-  }, [debouncedSearchTerm, sortBy]);
+  }, [ sortBy]);
 
   // if (loadingJob) {
   //   return (
@@ -83,7 +115,7 @@ function Home() {
       <div className="flex h-full justify-center">
         <div className="flex flex-col w-full sm:max-w-4xl mx-auto p-5 gap-5">
           <div className="flex justify-between">
-            <h1 className="text-xl sm:text-4xl">Danh sách các công việc</h1>
+            <h1 className="text-xl sm:text-4xl">Danh sách các công việc {jobData.count || ''}</h1>
             <Button
               className="bg-primary-600 text-primary-50"
               onClick={handleOpen}

@@ -6,7 +6,7 @@ import { request } from "../utils/request";
 import { authenticationContext } from "../context/authenticationContext";
 function Register() {
   const { height } = useResize();
-  const [data, setData] = useState({})
+  const [data, setData] = useState({});
   const { loginData } = useContext(authenticationContext);
   const [validate, setValidate] = useState({
     email: {
@@ -26,12 +26,12 @@ function Register() {
       message: "",
     },
   });
-  if(loginData.id) {
-      return <Navigate to="/"/>;
-    }
+  if (loginData.id) {
+    return <Navigate to="/" />;
+  }
   const handleChangeUsername = (e) => {
     const value = e.target.value;
-    setData({...data, username: value})
+    setData({ ...data, username: value });
     if (value.length < 5) {
       setValidate({
         ...validate,
@@ -52,7 +52,7 @@ function Register() {
   };
   const hanndleChangeFullname = (e) => {
     const value = e.target.value;
-    setData({...data, fullname: value})
+    setData({ ...data, fullname: value });
     if (value.length < 5) {
       setValidate({
         ...validate,
@@ -70,10 +70,10 @@ function Register() {
         },
       });
     }
-  }
+  };
   const handleChangePassword = (e) => {
     const value = e.target.value;
-    setData({...data, password: value})
+    setData({ ...data, password: value });
     if (value.length < 5) {
       setValidate({
         ...validate,
@@ -91,10 +91,10 @@ function Register() {
         },
       });
     }
-  }
+  };
   const handleChangeEmail = (e) => {
     const value = e.target.value;
-    setData({...data, email: value})
+    setData({ ...data, email: value });
     if (!value.match(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/)) {
       setValidate({
         ...validate,
@@ -111,26 +111,21 @@ function Register() {
           message: "",
         },
       });
-  }}
+    }
+  };
   const handleSubmit = async () => {
     try {
-      const response = await request('/register', {
+      const response = await request("/register", {
         body: JSON.stringify(data),
-      })
+      });
       // console.log(response);
-      alert(response.message)
-      
+      alert(response.message);
     } catch (error) {
       console.log(error);
-      
     }
-    
-  }
+  };
   return (
-    <div
-      className="flex justify-center items-center bg-accent text-white h-screen"
-      
-    >
+    <div className="flex justify-center items-center bg-accent text-white h-screen">
       <div className="bg-layer px-6 py-3 rounded-lg flex flex-col gap-7 h-full w-full sm:max-w-lg sm:h-auto justify-center items-center">
         <h1 className="text-4xl font-mono">Quản lý công việc</h1>
         <Input

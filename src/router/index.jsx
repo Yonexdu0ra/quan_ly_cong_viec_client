@@ -7,9 +7,11 @@ import RequireLoginPage from "./RequireLoginPage";
 import AuthenticationRoute from "./AuthenticationRoute";
 import LoadingPage from "./LoadingPage";
 import JobProvider from "../context/jobContext";
-import DefaultLayout from "../component/layout/DefaultLayout"; 
+import DefaultLayout from "../component/layout/DefaultLayout";
 const Register = lazy(() => import("../pages/Register"));
 const Home = lazy(() => import("../pages/Home"));
+const ChangePassword = lazy(() => import("../pages/ChangePassword"));
+const Profile = lazy(() => import("../pages/Profile"));
 const Login = lazy(() => import("../pages/Login"));
 const Error = lazy(() => import("../pages/Error"));
 
@@ -44,6 +46,22 @@ const router = createBrowserRouter([
                   </Suspense>
                 ),
                 path: "/",
+              },
+              {
+                element: (
+                  <Suspense fallback={<LoadingPage />}>
+                    <ChangePassword />
+                  </Suspense>
+                ),
+                path: "/change-password",
+              },
+              {
+                element: (
+                  <Suspense fallback={<LoadingPage />}>
+                    <Profile />
+                  </Suspense>
+                ),
+                path: "/profile",
               },
             ],
           },

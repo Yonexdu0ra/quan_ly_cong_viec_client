@@ -36,6 +36,9 @@ function Login() {
         setLoginData(response.data.user);
         return;
       }
+      if(response.status === "error") {
+        alert(response.message);
+      }
     } catch (error) {
       console.log(error);
     }

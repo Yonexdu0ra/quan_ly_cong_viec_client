@@ -32,6 +32,7 @@ function ModalCreateJob({ handleOpen, open }) {
       if (status === "success") {
         setJobData({
           ...jobData,
+          count: jobData.count + 1,
           rows: [response, ...jobData.rows],
         });
       }
