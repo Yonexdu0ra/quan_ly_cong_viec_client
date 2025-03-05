@@ -6,10 +6,7 @@ export const useSidebar = () => {
 };
 function SidebarContext({ children }) {
   const [isOpenSidebar, setIsOpenSidebar] = useState(false);
-  const toggleSidebar = useCallback(() => {
-    setIsOpenSidebar(!isOpenSidebar);
-  }, []);
-
+  const toggleSidebar = () => setIsOpenSidebar(!isOpenSidebar);
   return (
     <sidebarContext.Provider value={{ toggleSidebar, isOpenSidebar }}>
       {children}
