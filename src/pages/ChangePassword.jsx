@@ -203,7 +203,7 @@ function ChangePassword() {
   return (
     <div className="w-full h-full select-none">
       <div className="flex justify-center w-full h-full">
-        <div className="max-w-xl w-full">
+         <div className="max-w-xl w-full">
           <div className="flex justify-center items-center px-4 py-2 h-full flex-col gap-4">
             <form
               className="flex flex-col gap-4 w-full sm:shadow sm:rounded-md  sm:px-8 sm:py-4"

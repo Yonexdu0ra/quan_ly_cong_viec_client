@@ -8,7 +8,7 @@ function SidebarContext({ children }) {
   const [isOpenSidebar, setIsOpenSidebar] = useState(false);
   const toggleSidebar = useCallback(() => {
     setIsOpenSidebar(!isOpenSidebar);
-  });
+  }, []);
 
   return (
     <sidebarContext.Provider value={{ toggleSidebar, isOpenSidebar }}>

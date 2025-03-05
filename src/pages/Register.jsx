@@ -173,6 +173,7 @@ function Register() {
         </h1>
         <Input
           label="Tài khoản"
+          name="username"
           color="blue-gray"
           onChange={handleChangeUsername}
           required
@@ -187,6 +188,7 @@ function Register() {
         <Input
           label="Họ và tên"
           color="blue-gray"
+          name="fullname"
           required
           onChange={handleChangeFullname}
           error={formData.fullname.error}
@@ -197,6 +199,8 @@ function Register() {
         <Input
           label="Email"
           color="blue-gray"
+          type="email"
+          name="email"
           required
           onChange={handleChangeEmail}
           error={formData.email.error}
@@ -208,6 +212,7 @@ function Register() {
           label="Mật khẩu"
           color="blue-gray"
           type={showPassword ? "text" : "password"}
+          name="password"
           icon={
             showPassword ? (
               <EyeIcon
