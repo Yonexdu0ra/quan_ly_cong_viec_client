@@ -13,6 +13,10 @@ function Feedback() {
   const {addMessage} =useToast()
   const [isLoadingFeedback, setIsLoadingFeedback] = useState(true);
   const [ratingError, setRatingError] = useState(false);
+  const [errorContent, setErrorContent] = useState({
+    error: false,
+    message: "",
+  });
   const handleChangeRating = (value) => {
     if (ratingError) {
       setRatingError(false);
@@ -23,11 +27,15 @@ function Feedback() {
     });
   };
   const handleChangeContent = (e) => {
-    if (e.target.value.length > MAX_LENGTH_CONTENT) return;
-    setFormData({
-      ...formData,
-      content: e.target.value,
-    });
+     setFormData({
+       ...formData,
+       content: e.target.value,
+     });
+     setErrorContent({
+       error: e.target.value.length > MAX_LENGTH_CONTENT,
+       message: `Nội dung không được vượt quá ${MAX_LENGTH_CONTENT} ký tự`,
+     });
+   
   };
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -120,6 +128,7 @@ function Feedback() {
                   </span>
                   /<span>{MAX_LENGTH_CONTENT}</span>
                 </p>
+                <Alert open={errorContent.error} color="red">{errorContent.message}</Alert>
                 <Button type="submit" className="bg-primary-500">
                   Xác nhận
                 </Button>
