@@ -130,7 +130,7 @@ function Register() {
         const response = await request(
           "/check-username?username=" + deboundUsername
         );
-        console.log(response);
+        // console.log(response);
         if (response.status === "error") {
           setUsernameExist({
             ...usernameExist,

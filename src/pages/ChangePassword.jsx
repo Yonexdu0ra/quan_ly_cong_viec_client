@@ -75,6 +75,17 @@ function ChangePassword() {
       });
       return;
     }
+    if(value.length < 6) {
+      setPassword({
+        ...password,
+        currentPassword: {
+          value: value,
+          error: true,
+          message: "Mật khẩu phải có ít nhất 6 ký tự",
+        },
+      });
+      return;
+    }
     setPassword({
       ...password,
       currentPassword: {
@@ -106,6 +117,17 @@ function ChangePassword() {
           value: value,
           error: true,
           message: "Mật khẩu không được để trống",
+        },
+      });
+      return;
+    }
+    if(value.length < 6) {
+      setPassword({
+        ...password,
+        newPassword: {
+          value: value,
+          error: true,
+          message: "Mật khẩu phải có ít nhất 6 ký tự",
         },
       });
       return;
@@ -153,6 +175,17 @@ function ChangePassword() {
           value: value,
           error: true,
           message: "Mật khẩu không được để trống",
+        },
+      });
+      return;
+    }
+    if(value.length < 6) {
+      setPassword({
+        ...password,
+        confirmPassword: {
+          value: value,
+          error: true,
+          message: "Mật khẩu phải có ít nhất 6 ký tự",
         },
       });
       return;
