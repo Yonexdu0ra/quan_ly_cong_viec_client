@@ -16,6 +16,8 @@ import { useSchedule } from "../context/scheduleContext";
 function ModalCreateNotification({ open, onClose }) {
   const { addMessage } = useToast();
   const { setScheduleData } = useSchedule();
+  // const [date, setDate] = useState(new Date());
+  const date = useRef(new Date());
   const today = new Date();
   today.setMinutes(today.getMinutes() + 5);
   const currentDate = today.toISOString().split("T")[0];
@@ -45,39 +47,89 @@ function ModalCreateNotification({ open, onClose }) {
       value: currentTime,
     },
   });
-
   const { width } = useResize();
   const isMobile = width < 768;
   const size = isMobile ? "xxl" : "md";
   const handleChangeTitle = (e) => {
     const value = e.target.value;
-    if (value.length > MAX_LENGTH_TITLE) return;
+    if (value.length > MAX_LENGTH_TITLE) {
+      setFormData({
+        ...formData,
+        title: {
+          ...formData.title,
+          error: true,
+          message: "Tên thông báo không được quá 255 ký tự",
+          value
+        },
+      })
+      return;
+    }
     setFormData({
       ...formData,
       title: {
         ...formData.title,
+        error: false,
+        message: "",
         value,
       },
     });
   };
   const handleChangeContent = (e) => {
     const value = e.target.value;
-    if (value.length > MAX_LENGTH_CONTENT) return;
+    if (value.length > MAX_LENGTH_CONTENT) {
+
+      setFormData({
+        ...formData,
+        content: {
+          ...formData.content,
+          error: true,
+          message: "Nội dung thông báo không được quá 1000 ký tự",
+          value,
+        },
+      });
+
+      return
+    };
     setFormData({
       ...formData,
       content: {
         ...formData.content,
+        error: false,
+        message: "",
         value,
       },
     });
   };
   const handleChangeDate = (e) => {
     const value = e.target.value;
+    // console.log();
+    
+    const [year, month, day] = value.split("-");
+    date.current.setFullYear(year);
+    date.current.setMonth(parseInt(month) - 1);
+    date.current.setDate(day);
+
+    // console.log(date, today);
+
+    if (date.current < new Date().setHours(0, 0, 0, 0)) {
+      setFormData({
+        ...formData,
+        date: {
+          ...formData.date,
+          value,
+          error: true,
+          message: "Ngày không hợp lệ",
+        },
+      });
+      return;
+    }
 
     setFormData({
       ...formData,
       date: {
         ...formData.date,
+        error: false,
+        message: "",
         value,
       },
     });
@@ -86,7 +138,8 @@ function ModalCreateNotification({ open, onClose }) {
     const value = e.target.value;
     const currentHours = today.getHours();
     const currentMinutes = today.getMinutes();
-
+    
+    
     const [hours, minutes] = value.split(":");
     if (parseInt(hours) < currentHours) {
       setFormData({
@@ -148,7 +201,7 @@ function ModalCreateNotification({ open, onClose }) {
       if (response.status === "success") {
         setScheduleData((prevData) => {
           console.log(prevData);
-          
+
           return {
             ...prevData,
             count: prevData.count + 1,
@@ -169,10 +222,10 @@ function ModalCreateNotification({ open, onClose }) {
     }
   };
   const handleClickInputDate = (e) => {
-    e.target.showPicker();
+    // e.target.showPicker();
   };
   const handleClickInputTime = (e) => {
-    e.target.showPicker();
+    // e.target.showPicker();
   };
   return (
     <Dialog open={open} size={size} className="max-w-xl">
@@ -204,6 +257,9 @@ function ModalCreateNotification({ open, onClose }) {
             </span>
             /<span>{MAX_LENGTH_TITLE}</span>
           </p>
+          <Alert open={formData.title.error} color="red">
+            {formData.title.message}
+          </Alert>
           <Textarea
             label="Nội dung thông báo"
             color="gray"
@@ -223,20 +279,26 @@ function ModalCreateNotification({ open, onClose }) {
             </span>
             /<span>{MAX_LENGTH_CONTENT}</span>
           </p>
+          <Alert open={formData.content.error} color="red">
+            {formData.content.message}
+          </Alert>
           <Input
             type="date"
             min={currentDate}
             label="Ngày thông báo"
             required
-            onClick={handleClickInputDate}
+            // onClick={handleClickInputDate}
             onChange={handleChangeDate}
           />
+          <Alert open={formData.date.error} color="red">
+            {formData.date.message}
+          </Alert>
           <Input
             type="time"
             color="gray"
             label="Thời gian thông báo"
             required
-            onClick={handleClickInputTime}
+            // onClick={handleClickInputTime}
             onChange={handleChangeTime}
           />
           <Alert open={formData.time.error} color="red">
