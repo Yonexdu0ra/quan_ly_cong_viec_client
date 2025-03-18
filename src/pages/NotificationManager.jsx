@@ -168,9 +168,9 @@ function NotificationManager() {
                         className="flex flex-col shadow rounded-md p-4 bg-bg hover:scale-105 duration-300 gap-4 sm:flex-row  sm:justify-between sm:items-center overflow-hidden"
                       >
                         <div className="w-full sm:w-3/4 px-4 py-2 border-b-2 sm:border-r-2 sm:border-b-0 border-secondary-300 text-secondary-500">
-                          <h2 className="text-secondary-950 font-bold text-2xl text-center truncate">
+                          {/* <h2 className="text-secondary-950 font-bold text-2xl text-center truncate">
                             {schedule.title}
-                          </h2>
+                          </h2> */}
                           <p className="truncate font-mono text-secondary-500 bg-secondary-50 px-4 py-2 rounded-md">
                             {schedule.content}
                           </p>

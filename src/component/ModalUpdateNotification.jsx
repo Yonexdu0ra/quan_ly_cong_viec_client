@@ -147,7 +147,7 @@ function ModalUpdateNotification({ open, onClose, data }) {
       const response = await request("/schedule/" + data.id, {
         method: "PUT",
         body: {
-          title: formData.title.value,
+          // title: formData.title.value,
           content: formData.content.value,
           date: formData.date.value,
           time: formData.time.value,
@@ -198,7 +198,7 @@ function ModalUpdateNotification({ open, onClose, data }) {
           ref={formRef}
           onSubmit={handleSubmit}
         >
-          <Input
+          {/* <Input
             label="Tên thông báo"
             color="gray"
             required
@@ -216,7 +216,7 @@ function ModalUpdateNotification({ open, onClose, data }) {
               {formData.title.value.length}
             </span>
             /<span>{MAX_LENGTH_TITLE}</span>
-          </p>
+          </p> */}
           <Textarea
             label="Nội dung thông báo"
             color="gray"

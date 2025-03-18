@@ -191,7 +191,7 @@ function ModalCreateNotification({ open, onClose }) {
       const response = await request("/schedule", {
         method: "POST",
         body: {
-          title: formData.title.value,
+          // title: formData.title.value,
           content: formData.content.value,
           date: formData.date.value,
           time: formData.time.value,
@@ -238,14 +238,14 @@ function ModalCreateNotification({ open, onClose }) {
           ref={formRef}
           onSubmit={handleSubmit}
         >
-          <Input
+          {/* <Input
             label="Tên thông báo"
             color="gray"
             required
             onChange={handleChangeTitle}
             value={formData.title.value}
-          />
-          <p className="flex justify-end  text-gray-500 items-center gap-1">
+          /> */}
+          {/* <p className="flex justify-end  text-gray-500 items-center gap-1">
             <span
               className={`${
                 formData.title.value.length >= MAX_LENGTH_TITLE
@@ -255,11 +255,11 @@ function ModalCreateNotification({ open, onClose }) {
             >
               {formData.title.value.length}
             </span>
-            /<span>{MAX_LENGTH_TITLE}</span>
-          </p>
-          <Alert open={formData.title.error} color="red">
+            /<span>{MAX_LENGTH_TITLE}</span> */}
+          {/* </p> */}
+          {/* <Alert open={formData.title.error} color="red">
             {formData.title.message}
-          </Alert>
+          </Alert> */}
           <Textarea
             label="Nội dung thông báo"
             color="gray"
