@@ -34,13 +34,13 @@ function ModalViewNotification({ open, onClose, data }) {
       </DialogHeader>
       <DialogBody className="h-full overflow-y-auto">
         <div className="flex flex-col gap-4">
-          <Input
+          {/* <Input
             label="Tên thông báo"
             color="gray"
             required
             readOnly
             value={data.title}
-          />
+          /> */}
 
           <Textarea
             label="Nội dung thông báo"
