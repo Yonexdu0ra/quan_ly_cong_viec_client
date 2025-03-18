@@ -108,8 +108,9 @@ function ModalCreateNotification({ open, onClose }) {
     date.current.setFullYear(year);
     date.current.setMonth(parseInt(month) - 1);
     date.current.setDate(day);
-
-    // console.log(date, today);
+    
+    console.log(date.current < new Date().setHours(0, 0, 0, 0));
+    
 
     if (date.current < new Date().setHours(0, 0, 0, 0)) {
       setFormData({
