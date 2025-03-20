@@ -85,19 +85,19 @@ function ModalCreateJob({ open, onClose }) {
   };
   const handleChangeJobName = (event) => {
     const value = event.target.value;
-    if (value.length > MAX_LENGTH_JOBNAME) return;
     setFormData({
       ...formData,
       jobName: value,
     });
+    // if (value.length > MAX_LENGTH_JOBNAME) return;
   };
   const handleChangeJobDescription = (event) => {
     const value = event.target.value;
-    if (value.length > MAX_LENGTH_JOBDESCRIPTION) return;
     setFormData({
       ...formData,
-      jobDescription: event.target.value,
+      jobDescription: value,
     });
+    // if (value.length > MAX_LENGTH_JOBDESCRIPTION) return;
   };
   return (
     <Dialog open={open} size={size} className="max-w-xl">
