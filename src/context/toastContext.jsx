@@ -65,7 +65,7 @@ const ToastContext = ({ children }) => {
                   ? "Lỗi"
                   : "Thông báo"}
               </p>
-              <p>{item.message}</p>
+              <p className="toast-message">{item.message}</p>
             </div>
             <button
               className="text-gray-500 hover:text-black ml-4"
