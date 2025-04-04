@@ -42,6 +42,7 @@ const ToastContext = ({ children }) => {
       {children}
       <div
         ref={messageContainerRef}
+        id='toast-container'
         className="absolute bottom-10 right-10 md:right-12 max-w-80 sm:max-w-sm md:max-w-md w-full flex flex-col gap-4 z-[1000]"
       >
         {messages.map((item, index) => (

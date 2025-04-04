@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import useDebound from "../hooks/useDebound";
 import validate from "../utils/validate";
 import request from "../utils/request";
-import { useToast } from '../context/toastContext'
+import { useToast } from "../context/toastContext";
 function Register() {
   document.title = "Đăng ký tài khoản";
   const [showPassword, setShowPassword] = useState(false);
@@ -41,7 +41,7 @@ function Register() {
   const handleShowPassword = () => {
     setShowPassword(!showPassword);
   };
-  const handleSubmit =async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const response = await request("/register", {
@@ -52,13 +52,13 @@ function Register() {
           email: formData.email.value,
           password: formData.password.value,
         },
-      })
+      });
       addMessage(response);
     } catch (error) {
       addMessage({
         status: "error",
-        message: error.message || 'Đã có lỗi xảy ra vui lòng thử lại sau.',
-      })
+        message: error.message || "Đã có lỗi xảy ra vui lòng thử lại sau.",
+      });
     }
   };
   const handleChangeUsername = (e) => {
@@ -117,14 +117,13 @@ function Register() {
       isUernameExist: true,
     });
     if (!validate.isUsername(deboundUsername).status) {
-      
       return setUsernameExist({
         ...usernameExist,
         loading: false,
         isUernameExist: true,
       });
-    };
-    
+    }
+
     const checkUsername = async () => {
       try {
         const response = await request(
@@ -136,7 +135,7 @@ function Register() {
             ...usernameExist,
             loading: false,
             isUernameExist: true,
-          })
+          });
           setFormData({
             ...formData,
             username: {
@@ -144,7 +143,7 @@ function Register() {
               error: true,
               message: response.message,
             },
-          })
+          });
           return;
         }
         setUsernameExist({
@@ -158,7 +157,7 @@ function Register() {
           loading: true,
         });
         return;
-      } 
+      }
     };
     checkUsername();
   }, [deboundUsername]);
@@ -176,20 +175,21 @@ function Register() {
           name="username"
           color="blue-gray"
           onChange={handleChangeUsername}
-          required
+          autoComplete="off"
           error={formData.username.error}
-          
         />
         <Alert color="red" open={formData.username.error}>
           {formData.username.message}
         </Alert>
         {usernameExist.loading && <p>Đang kiểm tra tài khoản...</p>}
-        {!usernameExist.isUernameExist && <p className="text-green-500">Tài khoản này có thể dùng.</p>}
+        {!usernameExist.isUernameExist && (
+          <p className="text-green-500">Tài khoản này có thể dùng.</p>
+        )}
         <Input
           label="Họ và tên"
           color="blue-gray"
           name="fullname"
-          required
+          autoComplete="off"
           onChange={handleChangeFullname}
           error={formData.fullname.error}
         />
@@ -201,7 +201,7 @@ function Register() {
           color="blue-gray"
           type="email"
           name="email"
-          required
+          autoComplete="off"
           onChange={handleChangeEmail}
           error={formData.email.error}
         />
@@ -226,7 +226,7 @@ function Register() {
               />
             )
           }
-          required
+          autoComplete="off"
           onChange={handleChangePassword}
           error={formData.password.error}
         />

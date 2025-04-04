@@ -35,7 +35,7 @@ function ModalCreateJob({ open, onClose }) {
     title: value.title,
   }));
   const { width } = useResize();
-  const isMobile = width < 768;
+  const isMobile = width < 768;``
   const size = isMobile ? "xxl" : "md";
   const buttonRef = useRef();
   const handleSubmit = async (e) => {
