@@ -199,7 +199,7 @@ function Register() {
         <Input
           label="Email"
           color="blue-gray"
-          type="email"
+          type="text"
           name="email"
           autoComplete="off"
           onChange={handleChangeEmail}
