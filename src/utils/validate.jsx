@@ -40,7 +40,7 @@ class Validate {
         throw new Error("fullname phải có độ dài tối thiểu 5 ký tự");
       }
       if (fullname.length > 25) {
-        throw new Error("fullname phải có độ dài tối đa 25 ký tự");
+        throw new Error("fullname có độ dài tối đa 25 ký tự");
       }
       // if(fullname.length < 6 || fullname.length > 25) {
       //   throw new Error(
@@ -63,14 +63,13 @@ class Validate {
     }
   }
   isEmail(email) {
-    
     try {
       if (!email || email.trim() === "")
         throw new Error("Vui lòng nhập email");
       email = email.trim();
       const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
       if (!regex.test(email)) {
-        throw new Error("Email không hợp lệ");
+        throw new Error("email không hợp lệ");
       }
       return {
         status: true,
@@ -79,7 +78,7 @@ class Validate {
     } catch (error) {
       return {
         status: false,
-        message: error.message || "Email không hợp lệ",
+        message: error.message || "email không hợp lệ",
       };
     }
   }
@@ -87,12 +86,12 @@ class Validate {
     try {
       if (!password || password.trim() === "")
         throw new Error("Vui lòng nhập password");
-      password = password.trim();
+      // password = password.trim();
       if (password.length < 6) {
         throw new Error("password phải có tối thiểu 6 ký tự");
       }
       if (password.length > 25) {
-        throw new Error("password có tối đa 25 ký tự");
+        throw new Error("password có độ dài tối đa 25 ký tự");
       }
       // if(password.length < 6 || password.length > 25) {
       //   throw new Error(

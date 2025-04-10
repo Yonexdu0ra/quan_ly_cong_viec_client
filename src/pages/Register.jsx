@@ -1,5 +1,5 @@
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/solid";
-import { Alert, Button, Input, Spinner } from "@material-tailwind/react";
+import { Alert, Button, Input } from "@material-tailwind/react";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import useDebound from "../hooks/useDebound";
@@ -129,7 +129,6 @@ function Register() {
         const response = await request(
           "/check-username?username=" + deboundUsername
         );
-        // console.log(response);
         if (response.status === "error") {
           setUsernameExist({
             ...usernameExist,
